@@ -1,8 +1,10 @@
 import fetch from 'unfetch'
 import { GetMoviesUseCase } from '../../application/service/GetMoviesUseCase'
 import { HttpMoviesRepository } from '../movies/HttpMoviesRepository'
-import {SortMoviesUseCase} from "../../application/service/SortMoviesUseCase";
-import {InMemmoryMoviesRepository} from "../movies/InMemmoryMoviesRepository";
+import {SortMoviesUseCase} from '../../application/service/SortMoviesUseCase'
+import {InMemmoryMoviesRepository} from '../movies/InMemmoryMoviesRepository'
+import {SortMoviesService} from '../../domain/SortMoviesService'
+import {ChainedMoviesRepository} from '../movies/ChainedMoviesRepository'
 
 export default class Container {
     constructor({ config }) {
@@ -24,14 +26,21 @@ export default class Container {
 
     _buildGetMoviesUseCase() {
         return new GetMoviesUseCase({
-            repository: this._buildHttpMoviesRepository()
+            repository: this.getInstance({key: 'ChainedMoviesRepository'})
         })
     }
 
     _buildSortMoviesUseCase() {
         return new SortMoviesUseCase({
-            repository: this._buildInMemmoryMoviesRepository(),
-            sortMoviesService: this._buildSortMoviesService()
+            repository: this.getInstance({key: 'ChainedMoviesRepository'}),
+            sortMoviesService: SortMoviesService
+        })
+    }
+
+    _buildChainedMoviesRepository() {
+        return new ChainedMoviesRepository({
+            httpRepository: this.getInstance({key: 'HttpMoviesRepository'}),
+            inMemmoryRepository: this.getInstance({key: 'InMemmoryMoviesRepository'})
         })
     }
 
@@ -45,10 +54,6 @@ export default class Container {
     _buildInMemmoryMoviesRepository() {
         return new InMemmoryMoviesRepository()
     }
-
-    _buildSortMoviesService () {
-        return new SortMoviesService()
-    }
-
+    
     _buildEagerInstances() {}
 }
