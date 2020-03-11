@@ -4,8 +4,8 @@ class SortMoviesUseCase {
         this._sortMoviesService = sortMoviesService
     }
 
-    async execute() {
-        const movies = await this._repository.getMovies()
+    async execute({query}) {
+        const movies = await this._repository.getMovies({query})
         return this._sortMoviesService.sortByName({movies})
     }
 }

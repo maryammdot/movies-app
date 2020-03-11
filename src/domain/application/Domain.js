@@ -9,10 +9,10 @@ class Domain {
             .execute({ query })
     }
 
-    async sortMoviesByName() {
+    async sortMoviesByName({query}) {
         return this._container
             .getInstance({ key: 'SortMoviesUseCase' })
-            .execute()
+            .execute({query})
     }
 }
 
